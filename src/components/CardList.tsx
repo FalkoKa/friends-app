@@ -1,23 +1,19 @@
+import { User } from '../App';
 import Card from './Card';
 
 type Props = {
-  friends: {
-    id: number;
-    name: string;
-    username: string;
-    email: string;
-  }[];
+  robots: User[];
 };
 
-const CardList = ({ friends }: Props) => {
+const CardList = ({ robots }: Props) => {
   return (
     <div>
-      {friends.map((friend) => (
+      {robots.map((robot) => (
         <Card
-          key={friend.id}
-          name={friend.name}
-          email={friend.email}
-          id={friend.id}
+          key={robot.id}
+          name={robot.name}
+          email={robot.email}
+          id={robot.id}
         />
       ))}
     </div>

@@ -1,11 +1,12 @@
 import CardList from './components/CardList';
 import { connect } from 'react-redux';
 import Scroll from './components/Scroll';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import './App.css';
 import SearchBox from './components/SearchBox';
 import { setSearchField } from './actions';
-import { State } from './reducers';
+import { Dispatch } from 'redux';
+import { requestRobots } from './actions';
 
 export type User = {
   id: number;
@@ -17,37 +18,46 @@ export type User = {
 type Props = {
   searchField: string;
   onSearchChange: (event: React.FormEvent<HTMLInputElement>) => void;
+  onRequestRobots: () => void;
+  robots: User[];
+  error: string;
+  isPending: boolean;
 };
 
-const mapStateToProps = (state: State) => {
+const mapStateToProps = (state) => {
   return {
-    searchField: state.searchField,
+    searchField: state.searchRobots.searchField,
+    robots: state.requestRobots.robots,
+    isPending: state.requestRobots.idPending,
+    error: state.requestRobots.error,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
     onSearchChange: (event: React.FormEvent<HTMLInputElement>) =>
       dispatch(setSearchField(event.currentTarget.value)),
+    onRequestRobots: () => dispatch(requestRobots()),
   };
 };
 
-function App({ searchField, onSearchChange }: Props) {
-  const [robots, setRobots] = useState<User[]>([]);
-
+function App({
+  searchField,
+  onSearchChange,
+  onRequestRobots,
+  robots,
+  isPending,
+}: Props) {
   useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/users')
-      .then((response) => response.json())
-      .then((users) => {
-        setRobots(users);
-      });
+    console.log(onRequestRobots);
+    onRequestRobots();
   }, []);
 
   const filteredRobots = robots.filter((robot) => {
     return robot.name.toLowerCase().includes(searchField.toLowerCase());
   });
 
-  return !robots.length ? (
+  return isPending ? (
     <h1>Loading</h1>
   ) : (
     <div className="tc">

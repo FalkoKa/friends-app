@@ -1,20 +1,15 @@
-import { User } from '../App';
+import { Robot } from '../App';
 import Card from './Card';
 
 type Props = {
-  robots: User[];
+  robots: Robot[];
 };
 
 const CardList = ({ robots }: Props) => {
   return (
     <div>
       {robots.map((robot) => (
-        <Card
-          key={robot.id}
-          name={robot.name}
-          email={robot.email}
-          id={robot.id}
-        />
+        <Card key={robot.id} robot={robot} />
       ))}
     </div>
   );

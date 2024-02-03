@@ -1,14 +1,17 @@
+import { ChangeEventHandler } from 'react';
+
 type Props = {
-  searchChange: (event: React.FormEvent<HTMLInputElement>) => void;
+  searchChange: ChangeEventHandler<HTMLInputElement>;
+  placeholder?: string;
 };
 
-const SearchBox = ({ searchChange }: Props) => {
+const SearchBox = ({ searchChange, placeholder }: Props) => {
   return (
     <div className="pa2">
       <input
         className="pa3 ba b--green bg-lightest-blue"
         type="search"
-        placeholder="search robots"
+        placeholder={placeholder}
         onChange={searchChange}
       />
     </div>

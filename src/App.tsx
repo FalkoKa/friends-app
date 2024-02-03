@@ -1,68 +1,50 @@
+import { ChangeEvent, useEffect, useState } from 'react';
 import CardList from './components/CardList';
-import { connect } from 'react-redux';
 import Scroll from './components/Scroll';
-import { useEffect } from 'react';
-import './App.css';
 import SearchBox from './components/SearchBox';
-import { setSearchField } from './actions';
-import { Dispatch } from 'redux';
-import { requestRobots } from './actions';
+import Header from './components/Header';
+import './App.css';
+import { getData } from './utils/data.utils';
 
-export type User = {
+export type Robot = {
   id: number;
   name: string;
-  username: string;
   email: string;
 };
 
-type Props = {
-  searchField: string;
-  onSearchChange: (event: React.FormEvent<HTMLInputElement>) => void;
-  onRequestRobots: () => void;
-  robots: User[];
-  error: string;
-  isPending: boolean;
-};
+function App() {
+  const [searchField, setSearchField] = useState<string>('');
+  const [robots, setRobots] = useState<Robot[]>([]);
+  const [filteredRobots, setFiltereRobots] = useState<Robot[]>(robots);
 
-const mapStateToProps = (state) => {
-  return {
-    searchField: state.searchRobots.searchField,
-    robots: state.requestRobots.robots,
-    isPending: state.requestRobots.idPending,
-    error: state.requestRobots.error,
-  };
-};
-
-const mapDispatchToProps = (dispatch: Dispatch) => {
-  return {
-    onSearchChange: (event: React.FormEvent<HTMLInputElement>) =>
-      dispatch(setSearchField(event.currentTarget.value)),
-    onRequestRobots: () => dispatch(requestRobots()),
-  };
-};
-
-function App({
-  searchField,
-  onSearchChange,
-  onRequestRobots,
-  robots,
-  isPending,
-}: Props) {
   useEffect(() => {
-    console.log(onRequestRobots);
-    onRequestRobots();
+    const fetchUsers = async () => {
+      const users = await getData<Robot[]>(
+        'https://jsonplaceholder.typicode.com/users'
+      );
+      setRobots(users);
+    };
+
+    fetchUsers();
   }, []);
 
-  const filteredRobots = robots.filter((robot) => {
-    return robot.name.toLowerCase().includes(searchField.toLowerCase());
-  });
+  useEffect(() => {
+    const newFilteredRobots = robots.filter((robot) => {
+      return robot.name.toLocaleLowerCase().includes(searchField);
+    });
 
-  return isPending ? (
-    <h1>Loading</h1>
-  ) : (
+    setFiltereRobots(newFilteredRobots);
+  }, [robots, searchField]);
+
+  const onSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const searchFIeldString = event.currentTarget.value.toLocaleLowerCase();
+    setSearchField(searchFIeldString);
+  };
+
+  return (
     <div className="tc">
-      <h1 className="f1">RoboFriends</h1>
-      <SearchBox searchChange={onSearchChange} />
+      <Header />
+      <SearchBox searchChange={onSearchChange} placeholder="Search Robots" />
       <Scroll>
         <CardList robots={filteredRobots} />
       </Scroll>
@@ -70,4 +52,4 @@ function App({
   );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;
